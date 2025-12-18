@@ -1,15 +1,77 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "./generated"
-  moduleFormat    = "cjs"
+  provider     = "prisma-client"
+  output       = "./generated"
+  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Trend {
+  RISING
+  FALLING
+  STABLE
+}
+
+model Subject {
+  id           Int           @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  observations Observation[]
+}
+
+model Biomarker {
+  id        Int      @id @default(autoincrement())
+  loincCode String?
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  biomarkerAllowedUnits BiomarkerAllowedUnits[]
+  observations          Observation[]
+}
+
+model Units {
+  id                  Int      @id @default(autoincrement())
+  name                String   @unique
+  defaultTargetUnitId Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  defaultTargetUnit     BiomarkerAllowedUnits   @relation(fields: [defaultTargetUnitId], references: [id], name: "DefaultTargetUnit")
+  biomarkerAllowedUnits BiomarkerAllowedUnits[]
+}
+
+model BiomarkerAllowedUnits {
+  id          Int      @id @default(autoincrement())
+  biomarkerId Int
+  unitsId     Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  biomarker          Biomarker     @relation(fields: [biomarkerId], references: [id], onDelete: Cascade)
+  units              Units         @relation(fields: [unitsId], references: [id], onDelete: Cascade)
+  observations       Observation[]
+  unitsDefaultTarget Units[]       @relation(name: "DefaultTargetUnit")
+
+  @@unique([biomarkerId, unitsId])
+}
+
+model Observation {
+  id                      Int       @id @default(autoincrement())
+  subjectId               Int
+  biomarkerAllowedUnitsId Int
+  analyte                 Int
+  value                   Float
+  measuredAt              DateTime
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  deletedAt               DateTime?
+
+  biomarker             Biomarker             @relation(fields: [analyte], references: [id])
+  subject               Subject               @relation(fields: [subjectId], references: [id])
+  biomarkerAllowedUnits BiomarkerAllowedUnits @relation(fields: [biomarkerAllowedUnitsId], references: [id])
 }
