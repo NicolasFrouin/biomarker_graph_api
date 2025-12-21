@@ -5,5 +5,14 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^prisma/generated/client$": "<rootDir>/../prisma/generated/client",
+    "^prisma/generated/enums$": "<rootDir>/../prisma/generated/enums"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/setup-e2e.ts"],
+  "maxWorkers": 1,
+  "testTimeout": 30000
 }
