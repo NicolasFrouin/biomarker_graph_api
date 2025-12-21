@@ -1,98 +1,139 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Biomarker Graph API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a RESTful API built with NestJS that provides access to biomarker data stored in a Neo4j graph database. The API allows users to query and retrieve information about various biomarkers, their relationships, and associated data.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Requirements
 
-## Description
+- Docker (for containerization)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+For local development:
 
-## Project setup
+- Node.js (version 20 or higher)
+
+## Installation (Docker)
+
+1. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+2. Set up environment variables:  
+    Create a `.env` file in the root directory and add the `DATABASE_URL` variable. You can refer to the `.env.example` file for guidance.
+
+3. Start the app:
+
+    ```bash
+    docker-compose up -d
+    ```
+
+## Installation (Local Development)
+
+1. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+2. Set up environment variables:  
+    Create a `.env` file in the root directory and add the `DATABASE_URL` variable. You can refer to the `.env.example` file for guidance.
+
+3. Start the database:
+
+    ```bash
+    docker-compose up -d db
+    ```
+
+4. Initialize the database:
+
+    ```bash
+    npm run prisma:bootstrap
+    ```
+
+5. Start the application:
+
+    ```bash
+    npm run start
+    ```
+
+The API will be accessible at `http://localhost:3000`.
+
+## API Examples
+
+The snippets are documented in the Swagger UI, accessible at `http://localhost:3000/api`.
+
+## Testing
+
+To run the tests, use the following command:
 
 ```bash
-$ npm install
+npm run test
 ```
 
-## Compile and run the project
+And for e2e tests:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run test:e2e
 ```
 
-## Run tests
+## Design Notes
 
-```bash
-# unit tests
-$ npm run test
+### Framework Choice
 
-# e2e tests
-$ npm run test:e2e
+I chose NestJS because I habe a bit of experience with it and I think it fits well for building scalable and maintainable API. Plus, I like it.
 
-# test coverage
-$ npm run test:cov
-```
+### API Style
 
-## Deployment
+The API follows RESTful principles, because I never touched GraphQL. and uses standard HTTP methods (GET, POST, PUT, DELETE) for CRUD operations.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### ORM Choice
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+I choose Prisma because I'm familiar with it and it has good support for TypeScript and NestJS.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+### Data model rationale
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+I did the model I think fits best the requirements.
 
-## Resources
+I added a `AnalyteAllowedUnit` entity to handle the many-to-many relationship between `Analyte` and `Unit`, allowing each analyte to have multiple allowed units and be strict about it.
 
-Check out a few resources that may come in handy when working with NestJS:
+I put the trends as an enum (`Trend`) to limit the possible values and make it easier to handle in the code.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The `analyteAllowedUnitId` in `Observation` ensures that each observation uses a valid unit for the given analyte. That unit can be different from the default unit of the analyte, allowing flexibility while maintaining data integrity.
 
-## Support
+### Conversion approach
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+I used glucose, hemoglobin and creatinine (urine and blood) as examples.  
+I searched the common units for these analytes and implemented conversion functions between them.
+<https://heartcare.sydney/glucose-unit-conversion/#:~:text=Glucose%20levels%20are%20commonly%20measured,dL%20(milligrams%20per%20deciliter).>
+<https://www.mayoclinic.org/tests-procedures/creatinine-test/about/pac-20384646#:~:text=Serum%20creatinine%20is%20reported%20as,to%20119.3%20%C2%B5mol%2FL).>
+<https://www.gastro.medline.ch/Services_et_outils/Conversions_et_calculs/Conversion_de_mg_dl_en_mol_l.php>
 
-## Stay in touch
+### Known limitations
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- The API does not implement authentication or authorization mechanisms.
+- Error handling is basic and could be improved for better user experience.
+- The data model may need to be expanded to accommodate additional biomarker types and relationships in the future.
+- The `Unit` and `Analyte` inputs are in both forms (id and name/code), which was to make testing easier, but should be normalized.
+- The conversion functions are hardcoded and only cover a few analytes and units. A more scalable approach would be needed for a production system.
 
-## License
+### Next steps
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Implement authentication and authorization.
+- Improve error handling and validation.
+- Normalize input data for `Unit` and `Analyte`.
+
+## Questions
+
+<https://github.com/NicolasFrouin/biomarker_graph_api/issues/1>
+
+## ADRs
+
+I did not know about ADRs before so I tried but I'm not sure I did it right.
+
+They are in the `adr` folder.
+
+## Time spent
+
+Around 15 hours.
+
+I came back to coding after a break and had to relearn a few things, it was fun.
