@@ -23,57 +23,61 @@ model Subject {
   observations Observation[]
 }
 
-model Biomarker {
-  id        Int      @id @default(autoincrement())
-  loincCode String?
-  name      String
-  longName  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  biomarkerAllowedUnit BiomarkerAllowedUnit[]
-  observations         Observation[]
-}
-
-model Unit {
+model Analyte {
   id                  Int      @id @default(autoincrement())
-  name                String   @unique
+  loincCode           String?
+  name                String
+  longName            String?
   defaultTargetUnitId Int
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  defaultTargetUnit    BiomarkerAllowedUnit   @relation(fields: [defaultTargetUnitId], references: [id], name: "DefaultTargetUnit")
-  biomarkerAllowedUnit BiomarkerAllowedUnit[]
+  defaultTargetUnit  Unit                 @relation(fields: [defaultTargetUnitId], references: [id])
+  analyteAllowedUnit AnalyteAllowedUnit[]
+  observations       Observation[]
+
+  @@index([loincCode])
 }
 
-model BiomarkerAllowedUnit {
-  id          Int      @id @default(autoincrement())
-  biomarkerId Int
-  unitId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Unit {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  biomarker         Biomarker     @relation(fields: [biomarkerId], references: [id], onDelete: Cascade)
-  unit              Unit          @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  observations      Observation[]
-  unitDefaultTarget Unit[]        @relation(name: "DefaultTargetUnit")
+  analyteAllowedUnits AnalyteAllowedUnit[]
+  unitDefaultTarget   Analyte[]
 
-  @@unique([biomarkerId, unitId])
+  @@index([name])
+}
+
+model AnalyteAllowedUnit {
+  id        Int      @id @default(autoincrement())
+  analyteId Int
+  unitId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  analyte      Analyte       @relation(fields: [analyteId], references: [id], onDelete: Cascade)
+  unit         Unit          @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  observations Observation[]
+
+  @@unique([analyteId, unitId])
 }
 
 model Observation {
-  id                     Int       @id @default(autoincrement())
-  subjectId              Int
-  biomarkerAllowedUnitId Int
-  analyte                Int
-  value                  Float
-  measuredAt             DateTime
-  rawPayload             Json
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-  deletedAt              DateTime?
+  id                   Int       @id @default(autoincrement())
+  subjectId            Int
+  analyteAllowedUnitId Int
+  analyteId            Int
+  value                Float
+  measuredAt           DateTime
+  rawPayload           Json
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
 
-  biomarker            Biomarker            @relation(fields: [analyte], references: [id])
-  subject              Subject              @relation(fields: [subjectId], references: [id])
-  biomarkerAllowedUnit BiomarkerAllowedUnit @relation(fields: [biomarkerAllowedUnitId], references: [id])
+  analyte            Analyte            @relation(fields: [analyteId], references: [id])
+  subject            Subject            @relation(fields: [subjectId], references: [id])
+  analyteAllowedUnit AnalyteAllowedUnit @relation(fields: [analyteAllowedUnitId], references: [id])
 }
