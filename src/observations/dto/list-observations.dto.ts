@@ -16,11 +16,18 @@ export class ListObservationsDto {
     description: 'Filter criteria',
     required: false,
     type: String,
-    example: {
-      subjectId: 1,
-      analyteId: [3, 4],
-      measuredAtFrom: '2025-01-01',
-      measuredAtTo: '2025-12-31',
+    examples: {
+      Empty: {
+        value: null,
+      },
+      Filtered: {
+        value: {
+          subjectId: 1,
+          analyteId: [3, 4],
+          measuredAtFrom: '2025-01-01',
+          measuredAtTo: '2025-12-31',
+        },
+      },
     },
   })
   filter?: {
@@ -42,7 +49,14 @@ export class ListObservationsDto {
     description: 'Sort order',
     required: false,
     type: String,
-    example: { analyteId: 'desc', measuredAt: 'desc' },
+    examples: {
+      Empty: {
+        value: null,
+      },
+      Sorted: {
+        value: { analyteId: 'desc', measuredAt: 'desc' },
+      },
+    },
   })
   sort?: {
     subjectId?: 'asc' | 'desc';

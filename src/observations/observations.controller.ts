@@ -17,7 +17,7 @@ import { CreateObservationDto } from './dto/create-observation.dto';
 import { UpdateObservationDto } from './dto/update-observation.dto';
 import { ObservationsService } from './observations.service';
 import { ListObservationsDto } from './dto/list-observations.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @Controller('observations')
 export class ObservationsController {
@@ -75,6 +75,12 @@ export class ObservationsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get an observation by ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the observation to retrieve',
+    example: 1,
+  })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const obs = await this.observationsService.findOne(id);
     if (!obs) {
@@ -85,6 +91,12 @@ export class ObservationsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update an observation by ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the observation to update',
+    example: 1,
+  })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateObservationDto: UpdateObservationDto,
@@ -99,6 +111,12 @@ export class ObservationsController {
   @Delete(':id')
   @ApiResponse({ status: 200, description: 'Observation deleted successfully' })
   @ApiOperation({ summary: 'Delete an observation by ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID of the observation to delete',
+    example: 1,
+  })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const obs = await this.observationsService.findOne(id);
     if (obs) {
